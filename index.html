@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Eze's Home — Rentals</title>
+<style>
+/* ── ALL CSS VARIABLES PROPERLY DEFINED ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#f5f0e8;
+  --charcoal:#1a1a1a;
+  --rust:#c45e2a;
+  --rust-light:#e8855a;
+  --gold:#d4a843;
+  --muted:#8a7f72;
+  --card-bg:#ffffff;
+  --border:#e0d8ce;
+  --ink:#1a1714;
+  --paper:#ffffff;
+  --shadow:0 8px 40px rgba(0,0,0,0.10);
+  --radius:16px;
+  --transition:0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+body{
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--cream);color:var(--charcoal);
+  min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.5;
+}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none;min-height:100vh}
+.page.active{display:block;animation:fadeUp .4s ease}
+#loginPage.active{display:flex;min-height:100vh}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(245,240,232,0.95);
+  backdrop-filter:blur(12px);
+  padding:14px 36px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(196,94,42,0.15);
+}
+.nav-brand{font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;color:var(--charcoal)}
+.nav-brand span{color:var(--rust)}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-btn{
+  padding:8px 18px;border-radius:50px;border:none;cursor:pointer;
+  font-family:inherit;font-size:0.83rem;font-weight:600;transition:var(--transition);
+}
+.nav-btn.ghost{background:none;color:var(--muted)}.nav-btn.ghost:hover{color:var(--rust)}
+.nav-btn.outline{background:none;border:1.5px solid var(--border);color:var(--charcoal)}.nav-btn.outline:hover{border-color:var(--rust);color:var(--rust)}
+.nav-btn.filled{background:var(--rust);color:#fff}.nav-btn.filled:hover{background:var(--rust-light)}
+
+/* ── LOGIN PAGE ── */
+.login-left{
+  flex:1;display:flex;align-items:center;justify-content:center;padding:60px;
+  background:linear-gradient(150deg,#1a1714 0%,#2e1a0e 100%);
+}
+.login-brand{color:#fff;max-width:380px}
+.login-brand h2{font-size:2.8rem;font-weight:900;margin-bottom:14px;line-height:1.1;color:#fff}
+.login-brand h2 span{color:var(--gold)}
+.login-brand p{color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:32px}
+.login-right{
+  flex:1;background:var(--cream);
+  display:flex;align-items:center;justify-content:center;padding:60px;
+}
+.login-box{width:100%;max-width:400px}
+.login-box h3{font-size:1.9rem;font-weight:800;margin-bottom:6px}
+.login-box .sub{color:var(--muted);margin-bottom:28px;font-size:0.9rem}
+.role-tabs{
+  display:flex;gap:6px;margin-bottom:28px;
+  background:rgba(0,0,0,0.06);border-radius:50px;padding:4px;
+}
+.role-tab{
+  flex:1;padding:10px;border:none;border-radius:50px;background:transparent;
+  font-family:inherit;font-size:0.88rem;cursor:pointer;
+  transition:var(--transition);font-weight:600;color:var(--muted);
+}
+.role-tab.active{background:#fff;color:var(--charcoal);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.login-form-group{margin-bottom:16px}
+.login-form-group label{
+  display:block;font-size:0.72rem;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:5px;
+}
+.login-form-group input{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:inherit;font-size:0.9rem;background:#fdfcfa;color:var(--charcoal);
+  outline:none;transition:var(--transition);
+}
+.login-form-group input:focus{border-color:var(--rust);background:#fff}
+.login-note{font-size:0.75rem;color:var(--muted);margin-top:3px}
+.login-btn{
+  width:100%;padding:13px;background:var(--charcoal);color:#fff;
+  border:none;border-radius:12px;font-family:inherit;font-size:0.95rem;
+  font-weight:600;cursor:pointer;margin-top:6px;transition:var(--transition);
+}
+.login-btn:hover{background:var(--rust)}
+.error-msg{color:#c0392b;font-size:0.8rem;margin-top:10px;display:none}
+
+/* ── HERO ── */
+.hero{
+  max-width:1200px;margin:0 auto;padding:72px 40px 56px;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+.hero-eyebrow{
+  font-size:0.72rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--rust);font-weight:700;margin-bottom:12px;
+}
+.hero h1{font-size:clamp(2.2rem,4vw,3.6rem);font-weight:900;line-height:1.1;margin-bottom:16px}
+.hero h1 em{font-style:italic;color:var(--rust)}
+.hero p{color:var(--muted);line-height:1.75;margin-bottom:26px;font-size:1rem}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn-primary{
+  padding:13px 28px;background:var(--charcoal);color:#fff;border:none;
+  border-radius:50px;font-family:inherit;font-size:0.9rem;font-weight:600;
+  cursor:pointer;transition:var(--transition);
+}
+.btn-primary:hover{background:var(--rust)}
+.btn-secondary{
+  padding:13px 28px;background:transparent;color:var(--charcoal);
+  border:1.5px solid var(--border);border-radius:50px;font-family:inherit;
+  font-size:0.9rem;font-weight:600;cursor:pointer;transition:var(--transition);
+}
+.btn-secondary:hover{border-color:var(--rust);color:var(--rust)}
+
+/* ── GALLERY ── */
+.gallery-container{
+  width:100%;max-width:650px;margin:auto;
+  background:#fff;border-radius:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.12);overflow:hidden;
+}
+.main-image-container{width:100%;height:380px;overflow:hidden;background:#f3f3f3}
+.main-image{width:100%;height:100%;object-fit:cover;transition:0.4s}
+.thumbnail-container{display:flex;gap:8px;padding:12px;overflow-x:auto;background:#fafafa;flex-wrap:wrap}
+.thumb{
+  width:80px;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;
+  opacity:0.65;transition:0.3s;border:2px solid transparent;flex-shrink:0;
+}
+.thumb:hover{opacity:1;transform:scale(1.05)}
+.thumb.active{border:3px solid var(--rust);opacity:1}
+.property-info{padding:16px 20px}
+.price-tag{font-size:1.9rem;font-weight:900;color:var(--rust);margin-bottom:6px}
+.price-tag span{font-size:1rem;color:var(--muted);font-weight:400}
+
+/* ── INFO BAR ── */
+.info-bar{
+  background:var(--charcoal);color:#fff;padding:32px;
+  display:flex;justify-content:center;flex-wrap:wrap;gap:0;
+}
+.info-item{text-align:center;padding:0 32px;border-right:1px solid rgba(255,255,255,.1)}
+.info-item:last-child{border-right:none}
+.info-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+.info-value{font-size:1rem;font-weight:600}
+
+/* ── CONTACT CARDS ── */
+.contact-section{
+  max-width:1200px;margin:56px auto;padding:0 40px;
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;
+}
+.contact-card{background:var(--card-bg);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow)}
+.contact-card h3{font-size:1.2rem;font-weight:700;margin-bottom:16px}
+.contact-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.contact-icon{
+  width:40px;height:40px;background:var(--cream);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;
+}
+.contact-text .label{font-size:0.7rem;color:var(--muted);margin-bottom:1px}
+.contact-text .value{font-weight:600;font-size:0.88rem}
+
+/* ── DASHBOARD ── */
+.dash-wrap{max-width:1100px;margin:0 auto;padding:36px 40px}
+.dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:30px;flex-wrap:wrap;gap:12px}
+.dash-title{font-size:1.8rem;font-weight:800;margin-bottom:3px}
+.dash-sub{color:var(--muted);font-size:0.87rem}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 11px;border-radius:50px;font-size:0.72rem;font-weight:700}
+.badge.green{background:#e6f5ed;color:#2d7a4e}
+.badge.amber{background:#fff3e0;color:#b36a00}
+.badge.red{background:#fdecea;color:#c0392b}
+.badge.blue{background:#e8f0fe;color:#2a52a8}
+
+/* ── STAT CARDS ── */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-bottom:24px}
+.card{background:var(--card-bg);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);transition:var(--transition)}
+.card:hover{transform:translateY(-3px)}
+.card-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:12px;
+}
+.card-icon.rust{background:rgba(196,94,42,0.1)}
+.card-icon.gold{background:rgba(212,168,67,0.12)}
+.card-icon.blue{background:rgba(59,130,246,0.1)}
+.card-icon.green{background:rgba(34,197,94,0.1)}
+.card-value{font-size:1.8rem;font-weight:800;margin-bottom:3px}
+.card h4{font-size:0.88rem;font-weight:700;margin-bottom:4px}
+.card p{font-size:0.78rem;color:var(--muted);line-height:1.5}
+
+/* ── TABLES ── */
+.table-wrap{background:var(--card-bg);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:22px}
+.table-head{padding:16px 22px;border-bottom:1px solid var(--border);font-size:1rem;font-weight:700}
+.tbox{background:var(--card-bg);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:22px}
+.tbox-head{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tbox-head h3{font-size:1rem;font-weight:700}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{
+  padding:10px 18px;text-align:left;font-size:0.68rem;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);
+  background:#faf8f5;font-weight:600;white-space:nowrap;
+}
+td{padding:12px 18px;border-top:1px solid var(--border);font-size:0.84rem;vertical-align:middle}
+tr:hover td{background:#fdf9f5}
+.avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--rust),var(--gold));
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:0.72rem;font-weight:700;margin-right:7px;vertical-align:middle;
+}
+.empty-row{text-align:center;padding:32px;color:var(--muted);font-size:0.85rem}
+
+/* ── FORM SECTION ── */
+.form-section{background:var(--card-bg);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:22px}
+.form-section h3{font-size:1.1rem;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label,label{
+  font-size:0.72rem;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;
+}
+input,select,textarea{
+  width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:inherit;font-size:0.88rem;background:#fdfcfa;color:var(--charcoal);
+  outline:none;transition:var(--transition);
+}
+input:focus,select:focus,textarea:focus{border-color:var(--rust);background:#fff}
+textarea{resize:vertical;min-height:80px}
+.form-btn{
+  padding:11px 26px;background:var(--rust);color:#fff;border:none;
+  border-radius:50px;font-family:inherit;font-size:0.88rem;font-weight:600;
+  cursor:pointer;transition:var(--transition);margin-top:8px;
+}
+.form-btn:hover{background:var(--rust-light)}
+.form-btn.outline-btn{background:none;border:1.5px solid var(--border);color:var(--charcoal)}
+.form-btn.outline-btn:hover{border-color:var(--rust);color:var(--rust)}
+.form-btn.danger{background:#c0392b}.form-btn.danger:hover{background:#a93226}
+.form-btn.sm{padding:6px 14px;font-size:0.75rem}
+
+/* ── PAYMENT BALANCE BAR ── */
+.balance-bar{
+  display:flex;background:var(--cream);border:1.5px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:20px;flex-wrap:wrap;
+}
+.balance-cell{flex:1;min-width:150px;padding:16px 20px;border-right:1px solid var(--border)}
+.balance-cell:last-child{border-right:none}
+.balance-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:5px}
+.balance-val{font-size:1.7rem;font-weight:800;line-height:1}
+.balance-note{font-size:0.72rem;color:var(--muted);margin-top:4px}
+
+/* ── TIMER ── */
+.timer-display{font-size:2.2rem;font-weight:800;color:var(--rust);letter-spacing:1px;margin:8px 0}
+
+/* ── AGREEMENT BOX ── */
+.agreement-box{
+  background:#fdf9f5;border:1.5px solid #e8ddd0;border-radius:12px;
+  padding:22px;margin-bottom:16px;font-size:0.87rem;line-height:1.8;
+}
+.agreement-box h4{font-size:0.98rem;font-weight:700;margin-bottom:8px}
+
+/* ── FLAT GRID ── */
+.flat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:16px}
+.flat-card{border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--cream)}
+.flat-card img{width:100%;height:130px;object-fit:cover;display:block}
+.flat-card-body{padding:12px}
+.flat-card-name{font-weight:700;font-size:0.86rem;margin-bottom:2px}
+.flat-card-price{color:var(--rust);font-weight:700;font-size:0.9rem;margin-bottom:2px}
+.flat-card-meta{color:var(--muted);font-size:0.73rem;margin-bottom:10px}
+.flat-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── MODAL ── */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:#fff;border-radius:16px;padding:30px;width:100%;max-width:480px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;
+}
+.modal h3{font-size:1.3rem;font-weight:700;margin-bottom:18px}
+.modal-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.modal-form-grid .full{grid-column:1/-1}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--charcoal);color:#fff;
+  padding:13px 20px;border-radius:10px;font-size:0.85rem;z-index:9999;
+  transform:translateY(60px);opacity:0;transition:0.3s ease;max-width:300px;
+  box-shadow:0 6px 24px rgba(0,0,0,.2);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:36px;padding:40px 20px}
+  .contact-section{grid-template-columns:1fr;padding:0 20px}
+  #loginPage.active{flex-direction:column}
+  .login-left{padding:40px 24px;min-height:200px}
+  .login-right{padding:36px 24px}
+}
+@media(max-width:600px){
+  .nav{padding:12px 16px}
+  .dash-wrap{padding:16px}
+  .form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:1/-1}
+  .cards-grid{grid-template-columns:1fr 1fr}
+  .balance-bar{flex-direction:column}
+  .balance-cell{border-right:none;border-bottom:1px solid var(--border)}
+  .balance-cell:last-child{border-bottom:none}
+  .info-bar{flex-direction:column}
+  .info-item{padding:14px;border-right:none;border-bottom:1px solid rgba(255,255,255,.1)}
+  .info-item:last-child{border-bottom:none}
+  .modal-form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     HOMEPAGE — shown first
+═══════════════════════════════════ -->
+<div id="homePage" class="page active">
+  <nav class="nav">
+    <div class="nav-brand">Rent With<span>Ease</span></div>
+    <div class="nav-links">
+      <button class="nav-btn ghost" onclick="showPage('loginPage')">Sign In</button>
+      <button id="navLandlordBtn" class="nav-btn filled" onclick="showPage('landlordPage')" style="display:none">Landlord Portal</button>
+      <button id="navTenantBtn" class="nav-btn outline" onclick="showPage('tenantPage')" style="display:none">Tenant Portal</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <p class="hero-eyebrow">EZE Property Rentals</p>
+      <h1>Find your <em>perfect</em> place to call home</h1>
+      <p>Transparent pricing, verified landlords, zero hidden fees. Your next home is right here.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="showPage('loginPage')">Get Started</button>
+        <button class="btn-secondary" onclick="document.getElementById('flatsSection').scrollIntoView({behavior:'smooth'})">Contact Us</button>
+      </div>
+    </div>
+    <div>
+      <!-- Image Gallery -->
+      <div class="gallery-container">
+        <div class="main-image-container">
+          <img id="mainImage" src="flat 1 images/IMG_6026.JPG" class="main-image"
+               onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=700&auto=format&fit=crop'"/>
+        </div>
+        <div class="thumbnail-container">
+          <img src="flat 1 images/IMG_6026.JPG" class="thumb active" onclick="changeImage(this)"
+               >
+          <img src="flat 1 images/IMG_6027.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6028.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6029.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6030.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1484154218962-a197022b5858?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6031.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6032.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6033.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6034.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6035.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1484154218962-a197022b5858?w=200&auto=format&fit=crop'"/>
+          <img src="flat 1 images/IMG_6036.JPG" class="thumb" onclick="changeImage(this)"
+               onerror="this.src='https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=200&auto=format&fit=crop'"/>
+        </div>
+        <div class="property-info">
+          <div class="price-tag">NOW AVAILABLE!!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="flatsSection"></div>
+  <div class="info-bar">
+    <div class="info-item"><div class="info-label">Address</div><div class="info-value">17 Yemi Adetayo St, Salem Bus Stop, Lekki, Lagos</div></div>
+    <div class="info-item"><div class="info-label">Phone</div><div class="info-value">+234 814 769 9427</div></div>
+    <div class="info-item"><div class="info-label">Email</div><div class="info-value">ndubisi62@gmail.com</div></div>
+  </div>
+
+  <div class="contact-section">
+    <div class="contact-card">
+      <h3>&#128205; Visit Us</h3>
+      <div class="contact-row">
+        <div class="contact-icon">&#127962;</div>
+        <div class="contact-text"><div class="label">Address</div><div class="value">17 Yemi Adetayo Street, Salem Bus Stop, Lekki</div></div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-icon">&#128506;</div>
+        <div class="contact-text"><div class="label">Area</div><div class="value">Lagos State, Nigeria</div></div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <h3>&#128222; Contact Us</h3>
+      <div class="contact-row">
+        <div class="contact-icon">&#128241;</div>
+        <div class="contact-text"><div class="label">Phone</div><div class="value">+234 814 769 9427</div></div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-icon">&#9993;</div>
+        <div class="contact-text"><div class="label">Email</div><div class="value">ndubisi62@gmail.com</div></div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-icon">&#128172;</div>
+        <div class="contact-text"><div class="label">WhatsApp</div><div class="value">+234 814 769 9427</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     LOGIN PAGE
+═══════════════════════════════════ -->
+<div id="loginPage" class="page">
+  <div class="login-left">
+    <div class="login-brand">
+      <p style="font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Welcome to</p>
+      <h2>EZE'S <span>HOME</span><br>Rentals</h2>
+      <p>The best choice for your next home. Transparent, simple and trustworthy.</p>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-box">
+      <h3>Sign In</h3>
+      <p class="sub">Choose your role and enter your credentials</p>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setRole('landlord')">&#127968; Landlord</button>
+        <button class="role-tab" onclick="setRole('tenant')">&#128100; Tenant</button>
+      </div>
+      <div class="login-form-group">
+        <label>Username (Name)</label>
+        <input type="text" id="loginUsername" placeholder="Enter your full name"/>
+        <div class="login-note">Not case sensitive (surname and first name)</div>
+      </div>
+      <div class="login-form-group">
+        <label>Password (Phone Number)</label>
+        <input type="password" id="loginPassword" placeholder="Enter your phone number"
+               onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="login-btn" onclick="doLogin()">Sign In &#8594;</button>
+      <div class="error-msg" id="loginError">&#10060; Invalid name or phone number. Please try again.</div>
+      <p style="margin-top:14px;text-align:center">
+        <button onclick="showPage('homePage')"
+          style="background:none;border:none;color:var(--rust);cursor:pointer;font-size:0.82rem;text-decoration:underline;font-family:inherit">
+          &#8592; Back to Home
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     LANDLORD DASHBOARD
+═══════════════════════════════════ -->
+<div id="landlordPage" class="page">
+  <nav class="nav">
+    <div class="nav-brand">Landlord</div>
+    <div class="nav-links">
+      <button class="nav-btn ghost" onclick="showPage('homePage')">&#127968; Home</button>
+      <button class="nav-btn outline" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+  <div class="dash-wrap">
+
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Welcome, Eze Emmanuel Ndubisi &#128075;</div>
+        <div class="dash-sub">Manage your tenants, payments &amp; property</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="form-btn" onclick="openModal('addTenantModal')">+ Add Tenant</button>
+        <button class="form-btn outline-btn" onclick="openModal('addFlatModal')">+ Add Flat</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="cards-grid" id="landlordStats"></div>
+
+    <!-- Flat listings -->
+    <div class="form-section">
+      <h3>&#128444; Property Listings</h3>
+      <div class="flat-grid" id="flatGrid"></div>
+      <button class="form-btn outline-btn" onclick="openModal('addFlatModal')">+ Add Another Flat</button>
+    </div>
+
+    <!-- Tenants table -->
+    <div class="tbox">
+      <div class="tbox-head">
+        <h3>&#128101; All Tenants</h3>
+        <span class="badge blue" id="tenantBadge">0 active</span>
+      </div>
+      <div class="tscroll">
+        <table>
+          <thead><tr>
+            <th>Tenant</th><th>Phone</th><th>Occupation / ID</th>
+            <th>Rent/yr</th><th>Paid</th><th>Outstanding</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="tenantTbody"><tr><td colspan="8" class="empty-row">No tenants yet. Click + Add Tenant.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment records -->
+    <div class="tbox">
+      <div class="tbox-head"><h3>&#128176; All Payment Records</h3></div>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Tenant</th><th>Date</th><th>Amount</th><th>Method</th><th>Bank / Details</th><th>Reference</th><th>Status</th></tr></thead>
+          <tbody id="payTbody"><tr><td colspan="7" class="empty-row">No payments yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tenant reports -->
+    <div class="tbox">
+      <div class="tbox-head"><h3>&#128295; Reports from Tenants</h3></div>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Tenant</th><th>Type</th><th>Description</th><th>Urgency</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="reportTbody"><tr><td colspan="6" class="empty-row">No reports submitted.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Agreement -->
+    <div class="form-section">
+      <h3>&#128203; Rental Agreement</h3>
+      <div class="agreement-box" id="agreementPreview">
+        <h4>Standard Tenancy Agreement &mdash; Eze's Home Rentals</h4>
+        <p>This agreement is between <strong>Eze Emmanuel Ndubisi (Landlord)</strong> and the Tenant named herein. The Tenant agrees to pay rent at the agreed time, maintain the property in good condition, report any damages promptly, and not sublet without written consent. The Landlord agrees to maintain the property in habitable condition and provide adequate notice before entry. Breach of any clause may result in termination with 30 days' notice.</p>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Upload Agreement File (PDF / Word)</label>
+        <input type="file" id="agreementUpload" accept=".pdf,.doc,.docx,.txt" onchange="uploadAgreement(this)"/>
+      </div>
+      <button class="form-btn" onclick="downloadAgreement()">&#8595; Download Agreement</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     TENANT DASHBOARD
+═══════════════════════════════════ -->
+<div id="tenantPage" class="page">
+  <nav class="nav">
+    <div class="nav-brand">Eze's<span>Rentals</span></div>
+    <div class="nav-links">
+      <button class="nav-btn ghost" onclick="showPage('homePage')">&#127968; Home</button>
+      <button class="nav-btn outline" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+  <div class="dash-wrap">
+
+    <div class="dash-header">
+      <div>
+        <div class="dash-title" id="tenantWelcome">Welcome &#128075;</div>
+        <div class="dash-sub" id="tenantSub">—</div>
+      </div>
+      <span class="badge green">&#9679; Lease Active</span>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="cards-grid" id="tenantStats"></div>
+
+    <!-- Balance + Payment Form -->
+    <div class="form-section">
+      <h3>&#128179; Record a Payment</h3>
+      <div class="balance-bar">
+        <div class="balance-cell">
+          <div class="balance-label">Outstanding Balance</div>
+          <div class="balance-val" id="bOutstanding" style="color:var(--rust)">&#8358;—</div>
+          <div class="balance-note" id="bOutNote">—</div>
+        </div>
+        <div class="balance-cell">
+          <div class="balance-label">Annual Rent</div>
+          <div class="balance-val" id="bRent">&#8358;—</div>
+          <div class="balance-note">Per year</div>
+        </div>
+        <div class="balance-cell">
+          <div class="balance-label">Paid</div>
+          <div class="balance-val" id="bPaid" style="color:#2d7a4e">&#8358;—</div>
+          <div class="balance-note">Confirmed</div>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Amount Paid (&#8358;)</label>
+          <input type="number" id="tAmt" placeholder="e.g. 425000" min="1"/>
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select id="tMethod">
+            <option>Bank Transfer</option>
+            <option>Mobile Money</option>
+            <option>Cash</option>
+            <option>Card</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Bank / Account Details</label>
+          <input type="text" id="tBank" placeholder="e.g. GTBank — 0123456789"/>
+        </div>
+        <div class="form-group full">
+          <label>Reference / Note (optional)</label>
+          <input type="text" id="tRef" placeholder="e.g. Annual rent 2026"/>
+        </div>
+      </div>
+      <button class="form-btn" onclick="submitPayment()">Submit Payment</button>
+    </div>
+
+    <!-- Countdown -->
+    <div class="form-section">
+      <h3>&#9200; Next Rent Due</h3>
+      <div class="timer-display" id="rentTimer">—</div>
+      <p style="font-size:0.8rem;color:var(--muted)" id="timerLabel">—</p>
+    </div>
+
+    <!-- My Payments -->
+    <div class="tbox">
+      <div class="tbox-head"><h3>&#128196; My Payment History</h3></div>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Bank Details</th><th>Reference</th><th>Status</th></tr></thead>
+          <tbody id="myPayTbody"><tr><td colspan="6" class="empty-row">No payments yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Landlord contact -->
+    <div class="form-section">
+      <h3>&#128100; Your Landlord</h3>
+      <div class="contact-row">
+        <div class="contact-icon">&#128241;</div>
+        <div class="contact-text"><div class="label">Phone</div><div class="value">+234 814 769 9427</div></div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-icon">&#9993;</div>
+        <div class="contact-text"><div class="label">Email</div><div class="value">ndubisi62@gmail.com</div></div>
+      </div>
+    </div>
+
+    <!-- Agreement -->
+    <div class="form-section">
+      <h3>&#128203; My Tenancy Agreement</h3>
+      <div class="agreement-box" id="tenantAgrBox">
+        <h4>Loading your agreement…</h4>
+      </div>
+      <button class="form-btn" onclick="downloadAgreement()">&#8595; Download Agreement</button>
+    </div>
+
+    <!-- Report Form -->
+    <div class="form-section">
+      <h3>&#128295; Submit a Report</h3>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Report Type</label>
+          <select id="rType">
+            <option>Maintenance / Damage</option>
+            <option>Noise Complaint</option>
+            <option>Safety Concern</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Urgency</label>
+          <select id="rUrgency">
+            <option>Low — Not urgent</option>
+            <option>Medium — Within a week</option>
+            <option>High — ASAP</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea id="rDesc" placeholder="Describe the issue in detail…"></textarea>
+        </div>
+      </div>
+      <button class="form-btn" onclick="submitReport()">&#128228; Submit Report</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODALS
+═══════════════════════════════════ -->
+
+<!-- Add Tenant -->
+<div class="modal-bg" id="addTenantModal">
+  <div class="modal">
+    <h3>Add New Tenant</h3>
+    <div class="modal-form-grid">
+      <div class="form-group"><label>Full Name</label><input type="text" id="nt_name" placeholder="Surname and first name"/></div>
+      <div class="form-group"><label>Phone (Password)</label><input type="text" id="nt_phone" placeholder="e.g. 08012345678"/></div>
+      <div class="form-group"><label>Unit / Flat</label><input type="text" id="nt_unit" placeholder="e.g. Flat 1"/></div>
+      <div class="form-group"><label>Annual Rent (&#8358;)</label><input type="number" id="nt_rent" placeholder="e.g. 850000" min="1"/></div>
+      <div class="form-group full"><label>Occupation / Means of ID</label><input type="text" id="nt_job" placeholder="e.g. Nurse, Lagos Island Hospital"/></div>
+      <div class="form-group full"><label>Lease Start Date</label><input type="date" id="nt_start"/></div>
+    </div>
+    <div class="modal-btns">
+      <button class="form-btn outline-btn" onclick="closeModal('addTenantModal')">Cancel</button>
+      <button class="form-btn" onclick="addTenant()">Add Tenant</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Tenant -->
+<div class="modal-bg" id="editTenantModal">
+  <div class="modal">
+    <h3>Edit Tenant</h3>
+    <input type="hidden" id="et_id"/>
+    <div class="modal-form-grid">
+      <div class="form-group"><label>Full Name</label><input type="text" id="et_name"/></div>
+      <div class="form-group"><label>Phone</label><input type="text" id="et_phone"/></div>
+      <div class="form-group"><label>Unit / Flat</label><input type="text" id="et_unit"/></div>
+      <div class="form-group"><label>Annual Rent (&#8358;)</label><input type="number" id="et_rent"/></div>
+      <div class="form-group full"><label>Occupation</label><input type="text" id="et_job"/></div>
+    </div>
+    <div class="modal-btns">
+      <button class="form-btn outline-btn" onclick="closeModal('editTenantModal')">Cancel</button>
+      <button class="form-btn" onclick="saveEditTenant()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Flat -->
+<div class="modal-bg" id="addFlatModal">
+  <div class="modal">
+    <h3 id="flatModalTitle">Add Flat Listing</h3>
+    <div class="modal-form-grid">
+      <div class="form-group"><label>Flat Name / Title</label><input type="text" id="af_title" placeholder="e.g. Flat 1, 17 Yemi Adetayo"/></div>
+      <div class="form-group"><label>Price / Year (&#8358;)</label><input type="number" id="af_price" placeholder="e.g. 850000"/></div>
+      <div class="form-group"><label>Status Tag</label><input type="text" id="af_tag" placeholder="e.g. Available Now"/></div>
+      <div class="form-group"><label>Details</label><input type="text" id="af_meta" placeholder="e.g. 2 bed · 2 bath · Self-contain"/></div>
+      <div class="form-group full">
+        <label>Image URL <span style="color:var(--muted);font-weight:400">(paste a direct link)</span></label>
+        <input type="text" id="af_img" placeholder="https://…"/>
+      </div>
+      <div class="form-group full">
+        <label>— OR — Upload Image from Device</label>
+        <input type="file" id="af_file" accept="image/*" onchange="previewFlatImg(this)"/>
+        <img id="af_preview" src="" style="display:none;margin-top:8px;border-radius:8px;max-height:100px;object-fit:cover;width:100%"/>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="form-btn outline-btn" onclick="closeFlatModal()">Cancel</button>
+      <button class="form-btn" id="flatModalBtn" onclick="saveFlat()">Add Flat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const S = {
+  landlord: { name:'eze emmanuel', phone:'08147699427' },
+  tenants: [],
+  payments: [],
+  reports: [],
+  flats: [],
+  agreementText: null,
+  currentUser: null,
+  currentRole: 'landlord',
+  nextDueDate: null,
+  editingFlatId: null,
+  uploadedImg: null,
+};
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function uid(){ return 'x' + Math.random().toString(36).slice(2,8); }
+function $(id){ return document.getElementById(id); }
+function fmtN(n){ return '₦' + Number(n).toLocaleString('en'); }
+function initials(n){ return n.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+function toast(msg, type){
+  const t = $('toast');
+  const icon = type==='err' ? '❌ ' : type==='info' ? 'ℹ️ ' : '✅ ';
+  t.textContent = icon + msg;
+  t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 3400);
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if(id === 'landlordPage') renderLandlord();
+  if(id === 'tenantPage')   renderTenant();
+}
+
+function logout(){
+  S.currentUser = null;
+  $('navLandlordBtn').style.display = 'none';
+  $('navTenantBtn').style.display = 'none';
+  showPage('homePage');
+}
+
+function openModal(id){ $(id).classList.add('open'); }
+function closeModal(id){ $(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m =>
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); })
+);
+
+// ══════════════════════════════════════════
+// GALLERY
+// ══════════════════════════════════════════
+function changeImage(el){
+  $('mainImage').src = el.src;
+  document.querySelectorAll('.thumb').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════
+function setRole(r){
+  S.currentRole = r;
+  document.querySelectorAll('.role-tab').forEach((t,i) =>
+    t.classList.toggle('active', (i===0 && r==='landlord') || (i===1 && r==='tenant'))
+  );
+}
+
+function doLogin(){
+  const name  = $('loginUsername').value.trim().toLowerCase();
+  const phone = $('loginPassword').value.trim();
+  $('loginError').style.display = 'none';
+
+  if(S.currentRole === 'landlord'){
+    if(name === S.landlord.name && phone === S.landlord.phone){
+      S.currentUser = { role:'landlord' };
+      $('navLandlordBtn').style.display = '';
+      $('navTenantBtn').style.display = 'none';
+      showPage('landlordPage');
+    } else {
+      $('loginError').style.display = 'block';
+    }
+  } else {
+    const t = S.tenants.find(t =>
+      t.name.toLowerCase() === name && t.phone === phone && t.active
+    );
+    if(t){
+      S.currentUser = { role:'tenant', id: t.id };
+      $('navTenantBtn').style.display = '';
+      $('navLandlordBtn').style.display = 'none';
+      showPage('tenantPage');
+    } else {
+      $('loginError').style.display = 'block';
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+// LANDLORD RENDER
+// ══════════════════════════════════════════
+function renderLandlord(){
+  const active = S.tenants.filter(t => t.active);
+  const totalRent = active.reduce((a,t) => a + t.rent, 0);
+  const totalPaid = active.reduce((a,t) => a + t.paid, 0);
+  const totalOut  = Math.max(0, totalRent - totalPaid);
+  const openR     = S.reports.filter(r => r.status === 'In Review').length;
+
+  $('landlordStats').innerHTML = `
+    <div class="card">
+      <div class="card-icon rust">💰</div>
+      <div class="card-value">${fmtN(totalPaid)}</div>
+      <h4>Total Collected</h4>
+      <p>This payment cycle</p>
+    </div>
+    <div class="card">
+      <div class="card-icon gold">⚠️</div>
+      <div class="card-value">${fmtN(totalOut)}</div>
+      <h4>Outstanding</h4>
+      <p>Across all tenants</p>
+    </div>
+    <div class="card">
+      <div class="card-icon blue">👥</div>
+      <div class="card-value">${active.length}</div>
+      <h4>Active Tenants</h4>
+      <p>Currently leasing</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">🔧</div>
+      <div class="card-value">${openR}</div>
+      <h4>Open Reports</h4>
+      <p>Awaiting your review</p>
+    </div>`;
+
+  $('tenantBadge').textContent = active.length + ' active';
+
+  // Flat grid
+  $('flatGrid').innerHTML = !S.flats.length
+    ? '<p style="color:var(--muted);font-size:0.85rem;padding-bottom:12px">No flats added yet.</p>'
+    : S.flats.map(f => `
+        <div class="flat-card">
+          <img src="${f.img}" alt="${f.title}" onerror="this.style.display='none'"/>
+          <div class="flat-card-body">
+            <div class="flat-card-name">${f.title}</div>
+            <div class="flat-card-price">${fmtN(f.price)}/yr</div>
+            <div class="flat-card-meta">${f.meta}</div>
+            <div class="flat-card-actions">
+              <button class="form-btn outline-btn sm" onclick="openEditFlat('${f.id}')">Edit</button>
+              <button class="form-btn danger sm" onclick="removeFlat('${f.id}')">Remove</button>
+            </div>
+          </div>
+        </div>`).join('');
+
+  // Tenants table
+  $('tenantTbody').innerHTML = !active.length
+    ? '<tr><td colspan="8" class="empty-row">No tenants yet. Click + Add Tenant above.</td></tr>'
+    : active.map(t => {
+        const out = Math.max(0, t.rent - t.paid);
+        const sb  = t.paid >= t.rent ? 'green">Paid' : t.paid > 0 ? 'amber">Partial' : 'red">Unpaid';
+        return `<tr>
+          <td><span class="avatar">${initials(t.name)}</span>${t.name}</td>
+          <td>${t.phone}</td>
+          <td>${t.job}</td>
+          <td>${fmtN(t.rent)}</td>
+          <td>${fmtN(t.paid)}</td>
+          <td style="color:${out>0?'var(--rust)':'#2d7a4e'};font-weight:700">${fmtN(out)}</td>
+          <td><span class="badge ${sb}</span></td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <button class="form-btn outline-btn sm" onclick="openEditTenant('${t.id}')">Edit</button>
+              <button class="form-btn outline-btn sm" onclick="setRent('${t.id}')">Set Rent</button>
+              <button class="form-btn outline-btn sm" onclick="resetCycle('${t.id}')">Reset</button>
+              <button class="form-btn danger sm" onclick="deleteTenant('${t.id}')">Delete</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+
+  // Payments table
+  $('payTbody').innerHTML = !S.payments.length
+    ? '<tr><td colspan="7" class="empty-row">No payments recorded.</td></tr>'
+    : [...S.payments].reverse().map(p => {
+        const t = S.tenants.find(t => t.id === p.tid);
+        return `<tr>
+          <td>${t ? t.name : 'Unknown'}</td>
+          <td>${p.date}</td>
+          <td>${fmtN(p.amount)}</td>
+          <td>${p.method}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${p.bank||'—'}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${p.ref||'—'}</td>
+          <td><span class="badge green">${p.status}</span></td>
+        </tr>`;
+      }).join('');
+
+  // Reports table
+  $('reportTbody').innerHTML = !S.reports.length
+    ? '<tr><td colspan="6" class="empty-row">No reports yet.</td></tr>'
+    : S.reports.map(r => {
+        const t = S.tenants.find(t => t.id === r.tid);
+        const ub = r.urgency.startsWith('High') ? 'red' : r.urgency.startsWith('Medium') ? 'amber' : 'green';
+        return `<tr>
+          <td>${t ? t.name : 'Unknown'}</td>
+          <td>${r.type}</td>
+          <td>${r.desc}</td>
+          <td><span class="badge ${ub}">${r.urgency.split(' — ')[0]}</span></td>
+          <td>${r.date}</td>
+          <td><span class="badge amber">${r.status}</span></td>
+        </tr>`;
+      }).join('');
+}
+
+// ── Landlord Actions ──
+function addTenant(){
+  const name  = $('nt_name').value.trim();
+  const phone = $('nt_phone').value.trim();
+  const unit  = $('nt_unit').value.trim();
+  const rent  = parseFloat($('nt_rent').value) || 0;
+  const job   = $('nt_job').value.trim();
+  const start = $('nt_start').value;
+  if(!name || !phone || !unit || !rent){ toast('Please fill all required fields.','err'); return; }
+  if(S.tenants.find(t => t.phone === phone && t.active)){ toast('Phone number already in use.','err'); return; }
+  S.tenants.push({ id:uid(), name:name.toLowerCase(), phone, unit, rent, job, leaseStart:start, paid:0, active:true });
+  closeModal('addTenantModal');
+  ['nt_name','nt_phone','nt_unit','nt_rent','nt_job','nt_start'].forEach(i => $(i).value = '');
+  toast(name + ' added as a tenant.');
+  renderLandlord();
+}
+
+function openEditTenant(id){
+  const t = S.tenants.find(t => t.id === id); if(!t) return;
+  $('et_id').value = t.id;
+  $('et_name').value = t.name;
+  $('et_phone').value = t.phone;
+  $('et_unit').value = t.unit;
+  $('et_rent').value = t.rent;
+  $('et_job').value = t.job;
+  openModal('editTenantModal');
+}
+
+function saveEditTenant(){
+  const t = S.tenants.find(t => t.id === $('et_id').value); if(!t) return;
+  t.name  = $('et_name').value.trim().toLowerCase() || t.name;
+  t.phone = $('et_phone').value.trim() || t.phone;
+  t.unit  = $('et_unit').value.trim() || t.unit;
+  t.rent  = parseFloat($('et_rent').value) || t.rent;
+  t.job   = $('et_job').value.trim() || t.job;
+  closeModal('editTenantModal');
+  toast('Tenant updated.');
+  renderLandlord();
+}
+
+function setRent(id){
+  const t = S.tenants.find(t => t.id === id); if(!t) return;
+  const v = prompt('New annual rent for ' + t.name + ' (current: ' + fmtN(t.rent) + '):');
+  if(v === null) return;
+  const n = parseFloat(v);
+  if(!n || n <= 0){ toast('Invalid amount.','err'); return; }
+  t.rent = n;
+  toast('Rent updated to ' + fmtN(n) + ' for ' + t.name);
+  renderLandlord();
+}
+
+function resetCycle(id){
+  const t = S.tenants.find(t => t.id === id); if(!t) return;
+  if(!confirm('Reset paid amount to ₦0 for ' + t.name + '? This starts a new payment cycle.')) return;
+  t.paid = 0;
+  S.nextDueDate = null;
+  toast(t.name + ' reset to new cycle.','info');
+  renderLandlord();
+}
+
+function deleteTenant(id){
+  const t = S.tenants.find(t => t.id === id); if(!t) return;
+  if(!confirm('Delete tenant "' + t.name + '"? They will no longer be able to log in.')) return;
+  t.active = false;
+  toast(t.name + ' deleted.','info');
+  renderLandlord();
+}
+
+function previewFlatImg(input){
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    S.uploadedImg = e.target.result;
+    $('af_preview').src = e.target.result;
+    $('af_preview').style.display = 'block';
+    $('af_img').value = '';
+  };
+  r.readAsDataURL(file);
+}
+
+function saveFlat(){
+  const title = $('af_title').value.trim();
+  const price = parseFloat($('af_price').value) || 0;
+  const tag   = $('af_tag').value.trim();
+  const meta  = $('af_meta').value.trim();
+  const urlImg= $('af_img').value.trim();
+  const img   = S.uploadedImg || urlImg ||
+    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop';
+  if(!title || !price){ toast('Title and price are required.','err'); return; }
+
+  if(S.editingFlatId){
+    const f = S.flats.find(f => f.id === S.editingFlatId);
+    if(f){ f.title=title; f.price=price; f.tag=tag||f.tag; f.meta=meta||f.meta; f.img=img; }
+    toast('Flat updated.');
+  } else {
+    S.flats.push({ id:uid(), title, price, tag:tag||'Available', meta:meta||'', img });
+    toast('Flat listing added.');
+  }
+  closeFlatModal();
+  renderLandlord();
+}
+
+function openEditFlat(id){
+  const f = S.flats.find(f => f.id === id); if(!f) return;
+  S.editingFlatId = id;
+  $('af_title').value = f.title;
+  $('af_price').value = f.price;
+  $('af_tag').value   = f.tag;
+  $('af_meta').value  = f.meta;
+  $('af_img').value   = f.img.startsWith('data:') ? '' : f.img;
+  $('af_preview').style.display = 'none';
+  $('flatModalTitle').textContent = 'Edit Flat Listing';
+  $('flatModalBtn').textContent   = 'Save Changes';
+  openModal('addFlatModal');
+}
+
+function closeFlatModal(){
+  S.editingFlatId = null;
+  S.uploadedImg   = null;
+  ['af_title','af_price','af_tag','af_meta','af_img'].forEach(i => $(i).value = '');
+  $('af_preview').style.display = 'none';
+  $('af_file').value = '';
+  $('flatModalTitle').textContent = 'Add Flat Listing';
+  $('flatModalBtn').textContent   = 'Add Flat';
+  closeModal('addFlatModal');
+}
+
+function removeFlat(id){
+  if(!confirm('Remove this flat listing?')) return;
+  S.flats = S.flats.filter(f => f.id !== id);
+  toast('Flat removed.','info');
+  renderLandlord();
+}
+
+function uploadAgreement(input){
+  const f = input.files[0]; if(!f) return;
+  S.agreementText = '[Uploaded: ' + f.name + ']';
+  $('agreementPreview').innerHTML =
+    '<h4>Uploaded Agreement</h4><p>📄 <strong>' + f.name + '</strong> — ready to distribute to tenants.</p>';
+  toast('Agreement uploaded.');
+}
+
+function downloadAgreement(){
+  const text = S.agreementText ||
+    "EZE'S HOME RENTALS — TENANCY AGREEMENT\n\n" +
+    "Landlord: Eze Emmanuel Ndubisi\nAddress: 17 Yemi Adetayo Street, Salem Bus Stop, Lekki, Lagos\n\n" +
+    "Terms:\n- Rent is due annually as agreed.\n- Tenant must maintain the property in good condition.\n" +
+    "- Damages must be reported promptly.\n- Landlord provides adequate notice before entry.\n" +
+    "- Breach of terms results in 30-day notice of termination.\n\nBoth parties agree to these terms.";
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:'text/plain'}));
+  a.download = 'EzesHome_Agreement.txt';
+  a.click();
+  toast('Agreement downloaded.');
+}
+
+// ══════════════════════════════════════════
+// TENANT RENDER
+// ══════════════════════════════════════════
+function renderTenant(){
+  const cu = S.currentUser; if(!cu || cu.role !== 'tenant') return;
+  const t  = S.tenants.find(t => t.id === cu.id); if(!t) return;
+
+  // Display name properly capitalised
+  const displayName = t.name.split(' ').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  $('tenantWelcome').textContent = 'Welcome, ' + displayName.split(' ')[0] + ' 👋';
+  $('tenantSub').textContent     = t.unit + '  ·  Annual rent: ' + fmtN(t.rent);
+
+  const out = Math.max(0, t.rent - t.paid);
+
+  $('tenantStats').innerHTML = `
+    <div class="card">
+      <div class="card-icon rust">💸</div>
+      <div class="card-value">${fmtN(t.paid)}</div>
+      <h4>Paid This Cycle</h4>
+      <p>Annual rent: ${fmtN(t.rent)}</p>
+    </div>
+    <div class="card">
+      <div class="card-icon gold">⚠️</div>
+      <div class="card-value">${fmtN(out)}</div>
+      <h4>Outstanding</h4>
+      <p>${out > 0 ? 'Balance remaining' : 'Fully paid ✓'}</p>
+    </div>
+    <div class="card">
+      <div class="card-icon blue">🏠</div>
+      <div class="card-value">${t.unit}</div>
+      <h4>Your Unit</h4>
+      <p>Lease from ${t.leaseStart || '—'}</p>
+    </div>`;
+
+  $('bOutstanding').textContent = fmtN(out);
+  $('bOutstanding').style.color = out > 0 ? 'var(--rust)' : '#2d7a4e';
+  $('bOutNote').textContent     = out > 0 ? fmtN(t.paid) + ' paid · ' + fmtN(out) + ' remaining' : 'Fully paid ✓';
+  $('bRent').textContent        = fmtN(t.rent);
+  $('bPaid').textContent        = fmtN(t.paid);
+
+  $('tenantAgrBox').innerHTML = S.agreementText
+    ? '<h4>Agreement — ' + displayName + '</h4><p>' + S.agreementText + '</p>'
+    : '<h4>Tenancy Agreement — ' + displayName + '</h4>' +
+      '<p>Unit: <strong>' + t.unit + '</strong> &nbsp;·&nbsp; ' +
+      'Annual Rent: <strong>' + fmtN(t.rent) + '</strong> &nbsp;·&nbsp; ' +
+      'Lease Start: <strong>' + (t.leaseStart||'—') + '</strong><br/><br/>' +
+      "Standard Eze's Home Rentals terms apply. Rent is due annually. Report damages promptly. " +
+      'Both parties agree to these terms.</p>';
+
+  const myP = S.payments.filter(p => p.tid === t.id);
+  $('myPayTbody').innerHTML = !myP.length
+    ? '<tr><td colspan="6" class="empty-row">No payments yet.</td></tr>'
+    : [...myP].reverse().map(p => `
+        <tr>
+          <td>${p.date}</td>
+          <td>${fmtN(p.amount)}</td>
+          <td>${p.method}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${p.bank||'—'}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${p.ref||'—'}</td>
+          <td><span class="badge green">${p.status}</span></td>
+        </tr>`).join('');
+}
+
+// ── Tenant Actions ──
+function submitPayment(){
+  const cu = S.currentUser; if(!cu || cu.role !== 'tenant') return;
+  const t  = S.tenants.find(t => t.id === cu.id); if(!t) return;
+
+  const amt    = parseFloat($('tAmt').value);
+  const method = $('tMethod').value;
+  const bank   = $('tBank').value.trim();
+  const ref    = $('tRef').value.trim();
+
+  if(!amt || amt <= 0){ toast('Enter a valid amount.','err'); return; }
+  const out = Math.max(0, t.rent - t.paid);
+  if(out === 0){ toast('No outstanding balance. You are fully paid.','info'); return; }
+  if(amt > out + 0.01){ toast('Amount exceeds outstanding balance of ' + fmtN(out) + '.','err'); return; }
+
+  t.paid += amt;
+  const ref2 = ref || ('EZE-' + Date.now().toString().slice(-6));
+  // Set next due date: 1 year from today
+  const nxt = new Date();
+  nxt.setFullYear(nxt.getFullYear() + 1);
+  S.nextDueDate = nxt;
+
+  S.payments.push({ tid:t.id, date:todayStr(), amount:amt, method, bank, ref:ref2, status:'Confirmed' });
+  $('tAmt').value  = '';
+  $('tBank').value = '';
+  $('tRef').value  = '';
+  toast('Payment of ' + fmtN(amt) + ' recorded! Ref: ' + ref2);
+  renderTenant();
+}
+
+function submitReport(){
+  const cu = S.currentUser; if(!cu || cu.role !== 'tenant') return;
+  const desc = $('rDesc').value.trim();
+  if(!desc){ toast('Please describe the issue.','err'); return; }
+  S.reports.push({
+    tid: cu.id,
+    type: $('rType').value,
+    urgency: $('rUrgency').value,
+    desc, date: todayStr(), status:'In Review'
+  });
+  $('rDesc').value = '';
+  toast('Report submitted. Your landlord will be in touch.');
+}
+
+// ══════════════════════════════════════════
+// COUNTDOWN TIMER
+// ══════════════════════════════════════════
+function tick(){
+  const el  = $('rentTimer');
+  const lbl = $('timerLabel');
+  if(!el) return;
+
+  const now    = new Date();
+  const target = S.nextDueDate || new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+  const diff   = target - now;
+
+  if(diff <= 0){
+    el.textContent  = 'Due Now!';
+    if(lbl) lbl.textContent = 'Rent is due today.';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000)  / 60000);
+  const s = Math.floor((diff % 60000)    / 1000);
+  el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
+  if(lbl) lbl.textContent = 'Next due: ' + target.toDateString();
+}
+setInterval(tick, 1000);
+tick();
+</script>
+</body>
+</html>
